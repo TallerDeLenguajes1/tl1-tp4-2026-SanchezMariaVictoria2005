@@ -18,6 +18,9 @@ typedef struct Nodo
 
 Nodo *crearListas();
 Nodo *crearTarea();
+Nodo *buscarTarea(Nodo ** startTareasPendientes, int id) ;
+void trasferirTarea(Nodo ** startTareasRealizadas, Nodo *tarea);
+void mostrarListas(Nodo ** startTareasPendientes, Nodo ** startTareasRealizadas);
 
 int main ()
 {
@@ -53,6 +56,32 @@ int main ()
         
     }while(opcion == 1);
 
+    int id ; //id de la tarea a ingresar
+
+    do
+    {
+        puts ("1-mover tarea pendiente a realizada");
+        puts("2- finalizar");
+        scanf("%d", &opcion);
+
+        if (opcion == 1){
+            puts("ingrese id de la tareas");
+            scanf("%d", &id); //guardo el id ingresado
+            tarea = buscarTarea(&startTareasPendientes, id);
+            if (tarea){
+               
+                trasferirTarea(&starttareasRealizadas,tarea); 
+                
+            }else{
+                puts("el id ingresado es incorrecto");
+            }
+            
+        }
+
+    }while(opcion == 1);
+
+     mostrarListas(&startTareasPendientes, &starttareasRealizadas);
+
     return 0 ;
 }
 
@@ -75,4 +104,52 @@ Nodo *crearTarea()
     tarea->T.Duracion = rand()% 100 + 10 ; //duracion de la tarea
 
     return tarea;
+}
+
+Nodo *buscarTarea(Nodo **startTareasPendientes, int id) 
+{
+    Nodo *aux = *startTareasPendientes;
+    Nodo *anterior = *startTareasPendientes;
+    
+    while(aux != NULL && aux->T.TareaID != id){
+        anterior = aux ;
+        aux = aux->Siguiente; //me muevo en las listas hasta encontrar la que tiene el mismo id ingresado o hasta que apunte al final de la lista
+    }
+
+    if (aux){
+        anterior->Siguiente = anterior->Siguiente->Siguiente;
+    }
+    
+    return aux;
+}
+
+void trasferirTarea(Nodo **startTareasRealizadas, Nodo *tarea)
+{
+    
+    tarea->Siguiente = *startTareasRealizadas;
+    *startTareasRealizadas = tarea;
+}
+
+void mostrarListas(Nodo **startTareasPendientes, Nodo **startTareasRealizadas)
+{
+    Nodo *auxPendientes = *startTareasPendientes;
+    Nodo *auxRealizadas = * startTareasRealizadas;
+
+    puts("tareas pendientes:");
+    while (auxPendientes != NULL){
+        printf("ID: %d", auxPendientes->T.TareaID);
+        puts("descripcion:");
+        puts(auxPendientes->T.Descripcion);
+        printf("duracion: %d", auxPendientes->T.Duracion);
+        auxPendientes = auxPendientes->Siguiente;
+    }
+
+    puts("tareas Realizadas");
+    while (auxRealizadas != NULL){
+        printf("ID:%d", auxRealizadas->T.TareaID);
+        puts("descripcion:");
+        puts(auxRealizadas->T.Descripcion);
+        printf("duracion: %d", auxRealizadas->T.Duracion);
+        auxRealizadas = auxRealizadas->Siguiente;
+    }
 }
